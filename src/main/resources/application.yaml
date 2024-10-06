@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5434/flyway_db
+    username: flyway_user
+    password: 2381012
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
+    locations: classpath:db.migration #filesystem:db.migration
+    baseline-on-migrate: true
+    # repeatable-sql-migration-prefix: V
+    validate-on-migrate: true
