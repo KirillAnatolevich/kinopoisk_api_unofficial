@@ -19,3 +19,5 @@ spring:
     baseline-on-migrate: true
     # repeatable-sql-migration-prefix: V
     validate-on-migrate: true
+
+

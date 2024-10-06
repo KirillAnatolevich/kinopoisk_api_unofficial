@@ -21,9 +21,7 @@ public class KinopoiskDao {
     private RestTemplate restTemplate = new RestTemplate();
     private HttpHeaders httpHeaders = new HttpHeaders();
     private HttpEntity<String> entity;
-    private final String URL = "https://kinopoiskapiunofficial.tech/api/v2.2/films/{id}";
-    private final String HEADER_NAME = "X-API-KEY";
-    private final String HEADER_VALUE =  "894ac91a-9cd4-47c0-b468-bd797d07d1e1";
+
 
     public void generateHttpEntity(){
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
