@@ -14,14 +14,16 @@ public class Film {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String filmId;
+    private Long filmId;
     private String filmName;
-    private String year;
-    private String rating;
+    private Integer year;
+    private Double rating;
     @Column(length = 30_000)
     private String description;
 
-    public Film(String filmId, String filmName, String year, String rating, String description) {
+
+
+    public Film(Long filmId, String filmName, Integer year, Double rating, String description) {
         this.filmId = filmId;
         this.filmName = filmName;
         this.year = year;

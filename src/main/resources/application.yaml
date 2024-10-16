@@ -4,6 +4,7 @@ spring:
     username: flyway_user
     password: 2381012
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -19,5 +20,9 @@ spring:
     baseline-on-migrate: true
     # repeatable-sql-migration-prefix: V
     validate-on-migrate: true
-
-
+myapp:
+  api:
+    urlFilmsById: ${API_URL_FILM_BY_ID}
+    urlFilmsTypedCollections: ${API_URL_FILMS_BY_TYPE_COLLECTIONS}
+    name: ${HEADER_NAME}
+    token: ${HEADER_VALUE}
