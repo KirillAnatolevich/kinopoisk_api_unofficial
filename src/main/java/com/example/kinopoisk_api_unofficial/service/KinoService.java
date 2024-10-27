@@ -1,15 +1,17 @@
 package com.example.kinopoisk_api_unofficial.service;
 
+import com.example.kinopoisk_api_unofficial.client.KinopoiskClient;
 import com.example.kinopoisk_api_unofficial.dto.FilmDto;
 import com.example.kinopoisk_api_unofficial.dto.TypeCollections;
 import com.example.kinopoisk_api_unofficial.model.Film;
 import com.example.kinopoisk_api_unofficial.mupstruct.MappingFulms;
+import com.example.kinopoisk_api_unofficial.my_exception.CheckingTheArgumentExceptions;
 import com.example.kinopoisk_api_unofficial.repository.CrudRepositoryFilms;
-import com.example.kinopoisk_api_unofficial.repository.KinopoiskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -18,9 +20,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class KinoService {
     private final CrudRepositoryFilms repositoryFilms;
-    private final KinopoiskRepository kinopoiskRepository;
     private final MappingFulms mappingFulms;
-
+    private final KinopoiskClient kinopoiskClient;
 
     public Optional<List<Film>> saveFilms(Integer id, TypeCollections type){
         return Optional.of(mappingFulms
@@ -58,51 +59,41 @@ public class KinoService {
     //endregion
     //region KR
     public Optional<FilmDto> addFilmDtoById(Long id){
-        return kinopoiskRepository.addFilmDtoById(id);
+        if (id <= 0){
+            throw new CheckingTheArgumentExceptions("ID не может быть отрицательным");
+        }
+        return Optional.ofNullable(kinopoiskClient.addFindByIdFilm(id));
     }
-
     public Optional<List<FilmDto>> addListFilmsByType(Integer id, TypeCollections typeCollections){
-        return kinopoiskRepository.addListFilmsByType(id, typeCollections);
+        if (id<0 || id> 10){
+            throw new  CheckingTheArgumentExceptions().invalidNumber(1, 10);
+        }
+        return Optional.ofNullable(kinopoiskClient.addListFilmsByType(id, typeCollections));
     }
-
     public Optional<FilmDto> findFilmDtoById(Integer id, TypeCollections typeCollections, Long kinoId){
-        return kinopoiskRepository.findFilmDtoById(id, typeCollections, kinoId);
+        if (id<0 || id> 10){
+            throw new  CheckingTheArgumentExceptions().invalidNumber(1, 10);
+        }
+        return addListFilmsByType(id, typeCollections).flatMap(dtos -> dtos.stream().filter(filmDto -> Objects.equals(filmDto.getKinopoiskId(), kinoId)).findAny());
     }
     public Optional<FilmDto> findFilmDtoByNameRu(Integer id, TypeCollections typeCollections, String nameFilm){
-        return kinopoiskRepository.findFilmDtoByNameRu(id, typeCollections, nameFilm);
+        if (id<0 || id> 10){
+            throw new  CheckingTheArgumentExceptions().invalidNumber(1, 10);
+        }
+        return addListFilmsByType(id, typeCollections).map(dtos -> dtos.stream().filter(filmDto -> filmDto.getNameRu().equals(nameFilm)).findAny()).orElse(null);
     }
+
     public Optional<List<FilmDto>> findFilmsByRatingFrom(Integer id, TypeCollections typeCollections, Double ratingFrom){
-        return kinopoiskRepository.findFilmsByRatingFrom(id, typeCollections, ratingFrom);
+        if (id<0 || id> 10){
+            throw new  CheckingTheArgumentExceptions().invalidNumber(1, 10);
+        }
+        return Optional.of(addListFilmsByType(id, typeCollections).get().stream().filter(filmDto -> filmDto.getRatingKinopoisk() >= ratingFrom).toList());
     }
     public Optional<List<FilmDto>> findFilmsByRatingToo(Integer id, TypeCollections typeCollections, Double ratingTo){
-        return kinopoiskRepository.findFilmsByRatingToo(id, typeCollections, ratingTo);
+        if (id<0 || id> 10){
+            throw new  CheckingTheArgumentExceptions().invalidNumber(1, 10);
+        }
+        return Optional.of(addListFilmsByType(id, typeCollections).get().stream().filter(filmDto -> filmDto.getRatingKinopoisk() <= ratingTo).toList());
     }
-
     //endregion
-
-//    public List<FilmDto> getKinopoisk(int id, TypeCollections collections){
-//        return kinopoiskClient.addListFilmsByType(id, collections);
-//    }
-
-//    public List<Film> sortFilmsByYear(){
-//        return repositoryFilms.sortFilmByYear();
-//    }
-
-
-//    public FilmDto addKino(int index){
-//        FilmDto kinopoiskDto = kinopoiskClient.addFindByIdFilm(index);
-//        if (findByFilmName(kinopoiskDto.getNameRu()).isEmpty()) {
-//                save(mappingFulms.enrichFilm(kinopoiskDto));
-//        }
-//        return kinopoiskDto;
-//    }
-//
-//    public String addKino(int from, TypeCollections collections){
-//        for (FilmDto item: kinopoiskClient.addListFilmsByType(from, collections)) {
-//            if (findByFilmName(item.getNameRu()).isEmpty()) {
-//                save(mappingFulms.enrichFilm(item));
-//            }
-//        }
-//        return "addFilms";
-//    }
 }

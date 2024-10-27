@@ -1,16 +1,19 @@
 package com.example.kinopoisk_api_unofficial.client;
 
-import com.example.kinopoisk_api_unofficial.config.AppConfig;
 import com.example.kinopoisk_api_unofficial.config.Config;
 import com.example.kinopoisk_api_unofficial.dto.FilmDto;
 import com.example.kinopoisk_api_unofficial.dto.TypeCollections;
 import com.example.kinopoisk_api_unofficial.dto.TypedFilmsDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.http.HttpMethod;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+
+
 
 import java.util.List;
 
@@ -19,36 +22,44 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class KinopoiskClient {
-    private final RestTemplate restTemplate;
-    private final AppConfig config;
+    @Value("${myapp.api.urlFilmsById}")
+    private String urlFilmsById;
+    @Value("${myapp.api.urlFilmsTypedCollections}")
+    private String urlFilmsTypedCollections;
+    @Value("${myapp.api.name}")
+    private String name;
+    @Value("${myapp.api.token}")
+    private String token;
+
 
     public FilmDto addFindByIdFilm(Long id) {
         FilmDto kinopoiskDto = new FilmDto();
         try {
-            kinopoiskDto = restTemplate
+            kinopoiskDto = Config.restTemplate()
                     .exchange(
-                            String.format(config.getUrlFilmsById(), id),
+                            String.format(urlFilmsById, id),
                             HttpMethod.GET,
-                            Config.generateHttpEntity(config.getName(), config.getToken()),
+                            Config.generateHttpEntity(name, token),
                             FilmDto.class)
                     .getBody();
-        }catch (HttpClientErrorException e){
+        }catch (HttpClientErrorException e) {
+            log.error("Error fetching film with id {}: {}", id, e.getStatusCode());
             e.getStatusCode();
         }
         return kinopoiskDto;
     }
-
     public List<FilmDto> addListFilmsByType(int id, TypeCollections collections){
         TypedFilmsDto items = new TypedFilmsDto();
         try {
-            items = restTemplate
+            items = Config.restTemplate()
                     .exchange(
-                            String.format(config.getUrlFilmsTypedCollections(), collections, id),
+                            String.format(urlFilmsTypedCollections, collections, id),
                             HttpMethod.GET,
-                            Config.generateHttpEntity(config.getName(), config.getToken()),
+                            Config.generateHttpEntity(name, token),
                             TypedFilmsDto.class)
                     .getBody();
         }catch (HttpClientErrorException e){
+            log.error("Error fetching film with id {}: {}", id, e.getStatusCode());
             e.getStatusCode();
         }
         assert items != null;

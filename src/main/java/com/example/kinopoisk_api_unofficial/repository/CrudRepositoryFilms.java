@@ -9,14 +9,12 @@ import java.util.Optional;
 
 @Repository
 public interface CrudRepositoryFilms extends JpaRepository<Film, Long>{
-    //хочу фильтры по
-    //kinopoiskId, nameRu (использовать like) , ratingKinopoiskFrom, ratingKinopoiskTo
     Optional<Film> findByFilmName(String FilmName);
     Optional<Film> findByFilmId(Long id);
     Optional<List<Film>> findByYearGreaterThan(Integer year);
     Optional<List<Film>> findByRatingGreaterThan(Double rating);
     Optional<List<Film>> findByRatingLessThanEqual(Double rating);
-
+//    Просто напоминание что можно так
 //    @Query(value = "SELECT * FROM film ORDER BY year", nativeQuery = true)
 //    List<Film> sortFilmByYear();
 }
