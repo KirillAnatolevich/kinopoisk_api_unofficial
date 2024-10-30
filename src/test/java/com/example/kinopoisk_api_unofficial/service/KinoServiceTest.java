@@ -1,7 +1,7 @@
 package com.example.kinopoisk_api_unofficial.service;
 
 import com.example.kinopoisk_api_unofficial.client.KinopoiskClient;
-import com.example.kinopoisk_api_unofficial.dto.FilmDto;
+import com.example.kinopoisk_api_unofficial.dto.KinoDto;
 import com.example.kinopoisk_api_unofficial.dto.TypeCollections;
 import com.example.kinopoisk_api_unofficial.model.Film;
 import com.example.kinopoisk_api_unofficial.mupstruct.MappingFulms;
@@ -36,11 +36,11 @@ class KinoServiceTest {
     @Test
     void saveFilms() {
         // LIST DTO
-        FilmDto filmDto1 = new FilmDto(1L, "kinopoiskHDId1", "nameRu1", 3000, 1.0, "slogan1", "description1", "shortDescription1");
-        FilmDto filmDto2 = new FilmDto(2L, "kinopoiskHDId2", "nameRu2", 4000, 2.0, "slogan2", "description2", "shortDescription2");
-        List<FilmDto> filmsDto = new ArrayList<>();
-        filmsDto.add(filmDto1);
-        filmsDto.add(filmDto2);
+        KinoDto kinoDto1 = new KinoDto(1L, "kinopoiskHDId1", "nameRu1", 3000, 1.0, "slogan1", "description1", "shortDescription1");
+        KinoDto kinoDto2 = new KinoDto(2L, "kinopoiskHDId2", "nameRu2", 4000, 2.0, "slogan2", "description2", "shortDescription2");
+        List<KinoDto> filmsDto = new ArrayList<>();
+        filmsDto.add(kinoDto1);
+        filmsDto.add(kinoDto2);
         Film film1 = new Film(1L, 1L, "nameRu1", 3000, 1.0, "slogan1\ndescription1\nshortDescription1");
         Film film2 = new Film(2L, 2L, "nameRu2", 4000, 2.0, "slogan2\ndescription2\nshortDescription2");
 
@@ -178,24 +178,24 @@ class KinoServiceTest {
 
     @Test
     void addFilmDtoById() {
-        FilmDto filmDto = new FilmDto(1L, "kinopoiskHDId1", "nameRu1", 3000, 1.0, "slogan1", "description1", "shortDescription1");
+        KinoDto kinoDto = new KinoDto(1L, "kinopoiskHDId1", "nameRu1", 3000, 1.0, "slogan1", "description1", "shortDescription1");
 
-        when(kinopoiskClient.addFindByIdFilm(1L)).thenReturn(filmDto);
-        Optional<FilmDto> result = kinoService.addFilmDtoById(1L);
+        when(kinopoiskClient.addFindByIdFilm(1L)).thenReturn(kinoDto);
+        Optional<KinoDto> result = kinoService.addFilmDtoById(1L);
 
         assertTrue(result.isPresent());
-        assertEquals(result.get(), filmDto);
+        assertEquals(result.get(), kinoDto);
         verify(kinopoiskClient, times(1)).addFindByIdFilm(1L);
     }
 
     @Test
     void addListFilmsByType() {
-        FilmDto filmDto1 = new FilmDto(1L, "kinopoiskHDId1", "nameRu1", 3000, 1.0, "slogan1", "description1", "shortDescription1");
-        FilmDto filmDto2 = new FilmDto(2L, "kinopoiskHDId2", "nameRu2", 4000, 2.0, "slogan2", "description2", "shortDescription2");
-        List<FilmDto> filmsDto = List.of(filmDto1, filmDto2);
+        KinoDto kinoDto1 = new KinoDto(1L, "kinopoiskHDId1", "nameRu1", 3000, 1.0, "slogan1", "description1", "shortDescription1");
+        KinoDto kinoDto2 = new KinoDto(2L, "kinopoiskHDId2", "nameRu2", 4000, 2.0, "slogan2", "description2", "shortDescription2");
+        List<KinoDto> filmsDto = List.of(kinoDto1, kinoDto2);
 
         when(kinopoiskClient.addListFilmsByType(1, TypeCollections.CATASTROPHE_THEME)).thenReturn(filmsDto);
-        Optional<List<FilmDto>> result = kinoService.addListFilmsByType(1, TypeCollections.CATASTROPHE_THEME);
+        Optional<List<KinoDto>> result = kinoService.addListFilmsByType(1, TypeCollections.CATASTROPHE_THEME);
 
         assertTrue(result.isPresent());
         assertEquals(result.get().size(), 2);
@@ -204,57 +204,57 @@ class KinoServiceTest {
 
     @Test
     void findFilmDtoById() {
-        FilmDto filmDto1 = new FilmDto(1L, "kinopoiskHDId1", "nameRu1", 3000, 1.0, "slogan1", "description1", "shortDescription1");
-        FilmDto filmDto2 = new FilmDto(2L, "kinopoiskHDId2", "nameRu2", 4000, 2.0, "slogan2", "description2", "shortDescription2");
-        List<FilmDto> filmsDto = List.of(filmDto1, filmDto2);
+        KinoDto kinoDto1 = new KinoDto(1L, "kinopoiskHDId1", "nameRu1", 3000, 1.0, "slogan1", "description1", "shortDescription1");
+        KinoDto kinoDto2 = new KinoDto(2L, "kinopoiskHDId2", "nameRu2", 4000, 2.0, "slogan2", "description2", "shortDescription2");
+        List<KinoDto> filmsDto = List.of(kinoDto1, kinoDto2);
 
         when(kinopoiskClient.addListFilmsByType(1, TypeCollections.CATASTROPHE_THEME)).thenReturn(filmsDto);
-        Optional<FilmDto> result = kinoService.findFilmDtoById(1, TypeCollections.CATASTROPHE_THEME, 1L);
+        Optional<KinoDto> result = kinoService.findFilmDtoById(1, TypeCollections.CATASTROPHE_THEME, 1L);
 
         assertTrue(result.isPresent());
-        assertEquals(filmDto1, result.get());
+        assertEquals(kinoDto1, result.get());
         verify(kinopoiskClient, times(1)).addListFilmsByType(1, TypeCollections.CATASTROPHE_THEME);
     }
 
     @Test
     void findFilmDtoByNameRu() {
-        FilmDto filmDto1 = new FilmDto(1L, "kinopoiskHDId1", "nameRu1", 3000, 1.0, "slogan1", "description1", "shortDescription1");
-        FilmDto filmDto2 = new FilmDto(2L, "kinopoiskHDId2", "nameRu2", 4000, 2.0, "slogan2", "description2", "shortDescription2");
-        List<FilmDto> filmsDto = List.of(filmDto1, filmDto2);
+        KinoDto kinoDto1 = new KinoDto(1L, "kinopoiskHDId1", "nameRu1", 3000, 1.0, "slogan1", "description1", "shortDescription1");
+        KinoDto kinoDto2 = new KinoDto(2L, "kinopoiskHDId2", "nameRu2", 4000, 2.0, "slogan2", "description2", "shortDescription2");
+        List<KinoDto> filmsDto = List.of(kinoDto1, kinoDto2);
 
         when(kinopoiskClient.addListFilmsByType(1, TypeCollections.CATASTROPHE_THEME)).thenReturn(filmsDto);
-        Optional<FilmDto> result = kinoService.findFilmDtoByNameRu(1, TypeCollections.CATASTROPHE_THEME, "nameRu1");
+        Optional<KinoDto> result = kinoService.findFilmDtoByNameRu(1, TypeCollections.CATASTROPHE_THEME, "nameRu1");
 
         assertTrue(result.isPresent());
-        assertEquals(filmDto1, result.get());
+        assertEquals(kinoDto1, result.get());
         verify(kinopoiskClient, times(1)).addListFilmsByType(1, TypeCollections.CATASTROPHE_THEME);
     }
 
     @Test
     void findFilmsByRatingFrom() {
-        FilmDto filmDto1 = new FilmDto(1L, "kinopoiskHDId1", "nameRu1", 3000, 1.0, "slogan1", "description1", "shortDescription1");
-        FilmDto filmDto2 = new FilmDto(2L, "kinopoiskHDId2", "nameRu2", 4000, 2.0, "slogan2", "description2", "shortDescription2");
-        List<FilmDto> filmsDto = List.of(filmDto1, filmDto2);
+        KinoDto kinoDto1 = new KinoDto(1L, "kinopoiskHDId1", "nameRu1", 3000, 1.0, "slogan1", "description1", "shortDescription1");
+        KinoDto kinoDto2 = new KinoDto(2L, "kinopoiskHDId2", "nameRu2", 4000, 2.0, "slogan2", "description2", "shortDescription2");
+        List<KinoDto> filmsDto = List.of(kinoDto1, kinoDto2);
 
         when(kinopoiskClient.addListFilmsByType(1, TypeCollections.CATASTROPHE_THEME)).thenReturn(filmsDto);
-        Optional<List<FilmDto>> result = kinoService.findFilmsByRatingFrom(1, TypeCollections.CATASTROPHE_THEME, 2.0);
+        Optional<List<KinoDto>> result = kinoService.findFilmsByRatingFrom(1, TypeCollections.CATASTROPHE_THEME, 2.0);
 
         assertTrue(result.isPresent());
-        assertEquals(result.get().get(0), filmDto2);
+        assertEquals(result.get().get(0), kinoDto2);
         verify(kinopoiskClient, times(1)).addListFilmsByType(1, TypeCollections.CATASTROPHE_THEME);
     }
 
     @Test
     void findFilmsByRatingToo() {
-        FilmDto filmDto1 = new FilmDto(1L, "kinopoiskHDId1", "nameRu1", 3000, 1.0, "slogan1", "description1", "shortDescription1");
-        FilmDto filmDto2 = new FilmDto(2L, "kinopoiskHDId2", "nameRu2", 4000, 2.0, "slogan2", "description2", "shortDescription2");
-        List<FilmDto> filmsDto = List.of(filmDto1, filmDto2);
+        KinoDto kinoDto1 = new KinoDto(1L, "kinopoiskHDId1", "nameRu1", 3000, 1.0, "slogan1", "description1", "shortDescription1");
+        KinoDto kinoDto2 = new KinoDto(2L, "kinopoiskHDId2", "nameRu2", 4000, 2.0, "slogan2", "description2", "shortDescription2");
+        List<KinoDto> filmsDto = List.of(kinoDto1, kinoDto2);
 
         when(kinopoiskClient.addListFilmsByType(1, TypeCollections.CATASTROPHE_THEME)).thenReturn(filmsDto);
-        Optional<List<FilmDto>> result = kinoService.findFilmsByRatingToo(1, TypeCollections.CATASTROPHE_THEME, 1.0);
+        Optional<List<KinoDto>> result = kinoService.findFilmsByRatingToo(1, TypeCollections.CATASTROPHE_THEME, 1.0);
 
         assertTrue(result.isPresent());
-        assertEquals(result.get().get(0), filmDto1);
+        assertEquals(result.get().get(0), kinoDto1);
         verify(kinopoiskClient, times(1)).addListFilmsByType(1, TypeCollections.CATASTROPHE_THEME);
     }
 }

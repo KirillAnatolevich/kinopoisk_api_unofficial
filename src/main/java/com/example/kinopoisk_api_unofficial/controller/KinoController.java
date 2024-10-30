@@ -1,7 +1,7 @@
 
 package com.example.kinopoisk_api_unofficial.controller;
 
-import com.example.kinopoisk_api_unofficial.dto.FilmDto;
+import com.example.kinopoisk_api_unofficial.dto.KinoDto;
 import com.example.kinopoisk_api_unofficial.dto.TypeCollections;
 import com.example.kinopoisk_api_unofficial.model.Film;
 import com.example.kinopoisk_api_unofficial.service.KinoService;
@@ -19,6 +19,26 @@ import java.util.Optional;
 @RequestMapping("/api/v2/films")
 public class KinoController {
     private final KinoService kinoService;
+    @GetMapping("pageFilmsDTO")
+    public Page<Film> pageFilmsFilterDTO(@RequestParam(defaultValue = "0.0") Double minRating,
+                                         @RequestParam(defaultValue = "10.0") Double maxRating,
+                                         @RequestParam(defaultValue = "1900") Integer minYear,
+                                         @RequestParam(defaultValue = "2024") Integer maxYear,
+                                         @RequestParam(required = false, defaultValue = "") String name,
+                                         @RequestParam(defaultValue = "0") Integer page,
+                                         @RequestParam(defaultValue = "10") Integer size){
+        return kinoService.pageFilmsFilterDTO(minRating, maxRating, minYear, maxYear, name, PageRequest.of(page, size));
+    }
+    @GetMapping("/pageFilms")
+    public Page<Film> pageFilms(@RequestParam Double minRating,
+                                @RequestParam Double maxRating,
+                                @RequestParam Integer minYear,
+                                @RequestParam Integer maxYear,
+                                @RequestParam(required = false) String name,
+                                @RequestParam(defaultValue = "0") Integer page,
+                                @RequestParam(defaultValue = "10") Integer size){
+        return kinoService.pageFilms(minRating, maxRating, minYear, maxYear, name, PageRequest.of(page, size));
+    }
     @GetMapping("/pageByRaitingFilms")
     public Page<Film> pageByRaitingFilms(@RequestParam Double min,
                                          @RequestParam Double max,
@@ -83,39 +103,39 @@ public class KinoController {
 
     //region POST REST API
     @PostMapping("/filmDtoById")
-    public ResponseEntity<FilmDto> addFilmDtoById(@RequestParam Long id){
+    public ResponseEntity<KinoDto> addFilmDtoById(@RequestParam Long id){
         return kinoService.addFilmDtoById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
     @PostMapping("/filmsByType")
-    public ResponseEntity<List<FilmDto>> addListFilmsByType(
+    public ResponseEntity<List<KinoDto>> addListFilmsByType(
             @RequestParam Integer id,
             @RequestParam TypeCollections type){
         return kinoService.addListFilmsByType(id, type).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/filmsDtoById")
-    public FilmDto findFilmDtoById(
+    public KinoDto findFilmDtoById(
             @RequestParam(required = false) Integer id,
             @RequestParam(required = false) TypeCollections typeCollections,
             @RequestParam(required = false) Long kinoId){
         return kinoService.findFilmDtoById(id, typeCollections, kinoId).get();
     }
     @PostMapping("/filmDtoByNameRu")
-    public FilmDto findFilmDtoByNameRu(
+    public KinoDto findFilmDtoByNameRu(
             @RequestParam(required = false) Integer id,
             @RequestParam(required = false) TypeCollections typeCollections,
             @RequestParam(required = false) String nameFilm){
         return kinoService.findFilmDtoByNameRu(id, typeCollections, nameFilm).get();
     }
     @PostMapping("/filmsByRatingFrom")
-    public List<FilmDto> findFilmsByRatingFrom(
+    public List<KinoDto> findFilmsByRatingFrom(
             @RequestParam(required = false) Integer id,
             @RequestParam(required = false) TypeCollections typeCollections,
             @RequestParam(required = false) Double ratingFrom){
         return kinoService.findFilmsByRatingFrom(id, typeCollections, ratingFrom).get();
     }
     @PostMapping("/findFilmsByRatingToo")
-    public List<FilmDto> findFilmsByRatingToo(
+    public List<KinoDto> findFilmsByRatingToo(
             @RequestParam(required = false) Integer id,
             @RequestParam(required = false) TypeCollections typeCollections,
             @RequestParam(required = false) Double ratingTo){

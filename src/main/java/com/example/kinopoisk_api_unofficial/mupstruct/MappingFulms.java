@@ -1,6 +1,6 @@
 package com.example.kinopoisk_api_unofficial.mupstruct;
 
-import com.example.kinopoisk_api_unofficial.dto.FilmDto;
+import com.example.kinopoisk_api_unofficial.dto.KinoDto;
 import com.example.kinopoisk_api_unofficial.model.Film;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -24,9 +24,9 @@ public interface MappingFulms {
     @Mapping(source = "year", target = "year")
     @Mapping(source = "ratingKinopoisk", target = "rating")
     @Mapping(expression = "java(contactDescriptions(kinopoisk.getSlogan(), kinopoisk.getShortDescription(), kinopoisk.getDescription()))", target = "description")
-    Film enrichFilm(FilmDto kinopoisk);
+    Film enrichFilm(KinoDto kinopoisk);
 
-    List<Film> enrichFilms(List<FilmDto> filmDtos);
+    List<Film> enrichFilms(List<KinoDto> kinoDtos);
 
     default String contactDescriptions(String slogan, String shortDescription, String description){
         return slogan + "\n" + shortDescription + "\n" + description;

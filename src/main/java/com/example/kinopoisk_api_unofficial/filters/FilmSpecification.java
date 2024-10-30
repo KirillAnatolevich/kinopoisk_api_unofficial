@@ -1,11 +1,17 @@
 package com.example.kinopoisk_api_unofficial.filters;
 
+import com.example.kinopoisk_api_unofficial.dto.FilterDto;
 import com.example.kinopoisk_api_unofficial.model.Film;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Component
 public class FilmSpecification {
+    public static Specification<Film> buildFilter(FilterDto filterDto){
+        return ratingBitWin(filterDto.getMinRaring(), filterDto.getMaxRating())
+                .and(yearBitWin(filterDto.getMinYear(), filterDto.getMaxYear()))
+                .and(nameBitWin(filterDto.getName()));
+    }
     public static Specification<Film> ratingBitWin(Double min, Double max){
         return ((root, criteriaQuery, criteriaBuilder) -> {
             if (min != null || max != null){
@@ -14,6 +20,7 @@ public class FilmSpecification {
             return criteriaBuilder.conjunction();
         });
     }
+
     public static Specification<Film> yearBitWin(Integer min, Integer max){
         return ((root, criteriaQuery, criteriaBuilder) -> {
             if (min != null || max != null){
@@ -22,6 +29,7 @@ public class FilmSpecification {
             return criteriaBuilder.conjunction();
         });
     }
+
     public static Specification<Film> nameBitWin(String name){
         return ((root, criteriaQuery, criteriaBuilder) -> {
             if (name != null){

@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FilmDto {
+public class KinoDto {
     Long kinopoiskId;
     String kinopoiskHDId;
     String nameRu;

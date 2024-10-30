@@ -1,7 +1,8 @@
 package com.example.kinopoisk_api_unofficial.service;
 
 import com.example.kinopoisk_api_unofficial.client.KinopoiskClient;
-import com.example.kinopoisk_api_unofficial.dto.FilmDto;
+import com.example.kinopoisk_api_unofficial.dto.FilterDto;
+import com.example.kinopoisk_api_unofficial.dto.KinoDto;
 import com.example.kinopoisk_api_unofficial.dto.TypeCollections;
 import com.example.kinopoisk_api_unofficial.model.Film;
 import com.example.kinopoisk_api_unofficial.filters.FilmSpecification;
@@ -24,9 +25,36 @@ import java.util.stream.Collectors;
 public class KinoService {
     //private final Config config;
     private final CrudRepositoryFilms repositoryFilms;
-    private final MappingFulms mappingFulmsImpl;
+    private final MappingFulms mappingFulms;
     private final KinopoiskClient kinopoiskClient;
 
+    public Page<Film> pageFilmsFilterDTO(Double minRating,
+                                Double maxRating,
+                                Integer minYear,
+                                Integer maxYear,
+                                String name,
+                                Pageable pageable){
+        FilterDto filterDto = new FilterDto(minRating, maxRating, minYear, maxYear, name);
+        Specification<Film> specification = FilmSpecification.buildFilter(filterDto);
+        return repositoryFilms.findAll(specification, pageable);
+    }
+
+    public Page<Film> pageFilms(Double minRating,
+                                Double maxRating,
+                                Integer minYear,
+                                Integer maxYear,
+                                String name,
+                                Pageable pageable){
+        Specification<Film> specification = Specification.where(
+                        (minRating != null || maxRating != null) ?
+                                FilmSpecification.ratingBitWin(minRating, maxRating) : null)
+                .and((minYear != null || maxYear != null) ?
+                        FilmSpecification.yearBitWin(minYear, maxYear) : null)
+                .and(name != null ?
+                        FilmSpecification.nameBitWin(name) : null);
+
+        return repositoryFilms.findAll(specification, pageable);
+    }
     public Page<Film> pageByRaitingFilms(Double min, Double max, Pageable pageable){
         Specification<Film> specification = Specification.where(FilmSpecification.ratingBitWin(min, max));
         return repositoryFilms.findAll(specification, pageable);
@@ -41,9 +69,15 @@ public class KinoService {
         Specification<Film> specification = Specification.where(FilmSpecification.nameBitWin(name));
         return repositoryFilms.findAll(specification, pageable);
     }
+    public Optional<KinoDto> findFilmDtoByNameRu(Integer id, TypeCollections typeCollections, String nameFilm){
+        if (id<0 || id> 10){
+            throw new  CheckingTheArgumentExceptions().invalidNumber(1, 10);
+        }
+        return addListFilmsByType(id, typeCollections).map(dtos -> dtos.stream().filter(filmDto -> filmDto.getNameRu().equals(nameFilm)).findAny()).orElse(null);
+    }
 
     public List<Film> saveFilms(Integer id, TypeCollections type){
-        return mappingFulmsImpl
+        return mappingFulms
                 .enrichFilms(addListFilmsByType(id, type).get())
                 .stream()
                 .filter(film -> findByFilmName(film.getFilmName()) == null)
@@ -77,42 +111,37 @@ public class KinoService {
     }
     //endregion
     //region KR
-    public Optional<FilmDto> addFilmDtoById(Long id){
+    public Optional<KinoDto> addFilmDtoById(Long id){
         if (id <= 0){
             throw new CheckingTheArgumentExceptions("ID не может быть отрицательным");
         }
         return Optional.ofNullable(kinopoiskClient.addFindByIdFilm(id));
     }
-    public Optional<List<FilmDto>> addListFilmsByType(Integer id, TypeCollections typeCollections){
+    public Optional<List<KinoDto>> addListFilmsByType(Integer id, TypeCollections typeCollections){
         if (id<0 || id> 10){
             throw new  CheckingTheArgumentExceptions().invalidNumber(1, 10);
         }
-        Optional<List<FilmDto>> result = Optional.ofNullable(kinopoiskClient.addListFilmsByType(id, typeCollections));
+        Optional<List<KinoDto>> result = Optional.ofNullable(kinopoiskClient.addListFilmsByType(id, typeCollections));
         if (result.isPresent()){
             return result;
         }
         throw new  CheckingTheArgumentExceptions();
     }
-    public Optional<FilmDto> findFilmDtoById(Integer id, TypeCollections typeCollections, Long kinoId){
+    public Optional<KinoDto> findFilmDtoById(Integer id, TypeCollections typeCollections, Long kinoId){
         if (id<0 || id> 10){
             throw new  CheckingTheArgumentExceptions().invalidNumber(1, 10);
         }
         return addListFilmsByType(id, typeCollections).flatMap(dtos -> dtos.stream().filter(filmDto -> Objects.equals(filmDto.getKinopoiskId(), kinoId)).findAny());
     }
-    public Optional<FilmDto> findFilmDtoByNameRu(Integer id, TypeCollections typeCollections, String nameFilm){
-        if (id<0 || id> 10){
-            throw new  CheckingTheArgumentExceptions().invalidNumber(1, 10);
-        }
-        return addListFilmsByType(id, typeCollections).map(dtos -> dtos.stream().filter(filmDto -> filmDto.getNameRu().equals(nameFilm)).findAny()).orElse(null);
-    }
 
-    public Optional<List<FilmDto>> findFilmsByRatingFrom(Integer id, TypeCollections typeCollections, Double ratingFrom){
+
+    public Optional<List<KinoDto>> findFilmsByRatingFrom(Integer id, TypeCollections typeCollections, Double ratingFrom){
         if (id<0 || id> 10){
             throw new  CheckingTheArgumentExceptions().invalidNumber(1, 10);
         }
         return Optional.of(addListFilmsByType(id, typeCollections).get().stream().filter(filmDto -> filmDto.getRatingKinopoisk() >= ratingFrom).toList());
     }
-    public Optional<List<FilmDto>> findFilmsByRatingToo(Integer id, TypeCollections typeCollections, Double ratingTo){
+    public Optional<List<KinoDto>> findFilmsByRatingToo(Integer id, TypeCollections typeCollections, Double ratingTo){
         if (id<0 || id> 10){
             throw new  CheckingTheArgumentExceptions().invalidNumber(1, 10);
         }
