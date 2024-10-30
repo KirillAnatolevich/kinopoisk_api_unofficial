@@ -8,11 +8,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
-
+import org.springframework.web.client.RestTemplate;
 
 
 import java.util.List;
@@ -21,6 +25,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+
 public class KinopoiskClient {
     @Value("${myapp.api.urlFilmsById}")
     private String urlFilmsById;
@@ -30,7 +35,6 @@ public class KinopoiskClient {
     private String name;
     @Value("${myapp.api.token}")
     private String token;
-
 
     public FilmDto addFindByIdFilm(Long id) {
         FilmDto kinopoiskDto = new FilmDto();

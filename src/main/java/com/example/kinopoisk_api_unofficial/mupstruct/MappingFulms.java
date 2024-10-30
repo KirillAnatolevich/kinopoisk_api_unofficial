@@ -2,27 +2,33 @@ package com.example.kinopoisk_api_unofficial.mupstruct;
 
 import com.example.kinopoisk_api_unofficial.dto.FilmDto;
 import com.example.kinopoisk_api_unofficial.model.Film;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.factory.Mappers;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Component
-@RequiredArgsConstructor
-public class MappingFulms {
-    public Film enrichFilm(FilmDto kinopoisk){
-        return new Film(
-                kinopoisk.getKinopoiskId(),
-                kinopoisk.getNameRu(),
-                kinopoisk.getYear(),
-                kinopoisk.getRatingKinopoisk(),
-                kinopoisk.getSlogan() + "\n" +
-                        kinopoisk.getDescription() + "\n" +
-                        kinopoisk.getShortDescription());
-    }
+@Mapper(
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        componentModel = MappingConstants.ComponentModel.SPRING
+        //    unmappedTargetPolicy = ReportingPolicy.IGNORE
+)
+public interface MappingFulms {
 
-    public List<Film> enrichFilms(List<FilmDto> filmDtos){
-        return filmDtos.stream().map(this::enrichFilm).collect(Collectors.toList());
+    MappingFulms INSTANCE = Mappers.getMapper(MappingFulms.class);
+
+    @Mapping(source = "kinopoiskId", target = "filmId")
+    @Mapping(source = "nameRu", target = "filmName")
+    @Mapping(source = "year", target = "year")
+    @Mapping(source = "ratingKinopoisk", target = "rating")
+    @Mapping(expression = "java(contactDescriptions(kinopoisk.getSlogan(), kinopoisk.getShortDescription(), kinopoisk.getDescription()))", target = "description")
+    Film enrichFilm(FilmDto kinopoisk);
+
+    List<Film> enrichFilms(List<FilmDto> filmDtos);
+
+    default String contactDescriptions(String slogan, String shortDescription, String description){
+        return slogan + "\n" + shortDescription + "\n" + description;
     }
 }

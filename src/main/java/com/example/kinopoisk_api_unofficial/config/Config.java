@@ -1,12 +1,21 @@
 package com.example.kinopoisk_api_unofficial.config;
 
+import com.example.kinopoisk_api_unofficial.dto.FilmDto;
+import com.example.kinopoisk_api_unofficial.dto.TypeCollections;
+import com.example.kinopoisk_api_unofficial.dto.TypedFilmsDto;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @Configuration
 public class Config {
@@ -14,7 +23,6 @@ public class Config {
     public static RestTemplate restTemplate(){
         return new RestTemplate();
     }
-
     @Bean
     @Scope("Prototype")
     public static HttpEntity<String> generateHttpEntity(String name, String token){
@@ -23,4 +31,5 @@ public class Config {
         httpHeaders.add(name, token);
         return new HttpEntity<>(httpHeaders);
     }
+
 }

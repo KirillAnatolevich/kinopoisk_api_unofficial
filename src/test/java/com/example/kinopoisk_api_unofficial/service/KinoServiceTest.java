@@ -27,7 +27,7 @@ class KinoServiceTest {
     @Mock
     private CrudRepositoryFilms repositoryFilms;
     @Mock
-    private MappingFulms mappingFulms;
+    private MappingFulms mappingFulmsImpl;
     @Mock
     private KinopoiskClient kinopoiskClient;
     @InjectMocks
@@ -45,22 +45,22 @@ class KinoServiceTest {
         Film film2 = new Film(2L, 2L, "nameRu2", 4000, 2.0, "slogan2\ndescription2\nshortDescription2");
 
         when(kinopoiskClient.addListFilmsByType(1, TypeCollections.CATASTROPHE_THEME)).thenReturn(filmsDto);
-        when(mappingFulms.enrichFilms(filmsDto)).thenReturn(List.of(film1, film2));
-        when(repositoryFilms.findByFilmName("nameRu1")).thenReturn(Optional.of(film1));
-        when(repositoryFilms.findByFilmName("nameRu2")).thenReturn(Optional.empty());
-        Optional<List<Film>> result = kinoService.saveFilms(1, TypeCollections.CATASTROPHE_THEME);
+        when(mappingFulmsImpl.enrichFilms(filmsDto)).thenReturn(List.of(film1, film2));
+        when(repositoryFilms.findByFilmName("nameRu1")).thenReturn(film1);
+        when(repositoryFilms.findByFilmName("nameRu2")).thenReturn(null);
+        List<Film> result = kinoService.saveFilms(1, TypeCollections.CATASTROPHE_THEME);
 
         logger.info("We check that the data is not null");
-        assertTrue(result.isPresent());
+        assertTrue(result != null);
         logger.info("not null\n");
 
         logger.info("Checking for the correct number of saved items");
-        assertEquals(1, result.get().size());
+        assertEquals(1, result.size());
         logger.info("Correctly stores unique values\n");
 
         logger.info("Checking for the correct number of method calls");
         verify(kinopoiskClient, times(1)).addListFilmsByType(1, TypeCollections.CATASTROPHE_THEME);
-        verify(mappingFulms, times(1)).enrichFilms(filmsDto);
+        verify(mappingFulmsImpl, times(1)).enrichFilms(filmsDto);
         verify(repositoryFilms, times(1)).save(any(Film.class));
         logger.info("The check for the number of method calls was successful\n");
 
@@ -126,12 +126,12 @@ class KinoServiceTest {
     void findByFilmName() {
         Film film1 = new Film(1L, 1L, "nameRu1", 3000, 1.0, "slogan1\ndescription1\nshortDescription1");
 
-        when(repositoryFilms.findByFilmName("nameRu1")).thenReturn(Optional.of(film1));
-        Optional<Film> result = kinoService.findByFilmName("nameRu1");
+        when(repositoryFilms.findByFilmName("nameRu1")).thenReturn(film1);
+        Film result = kinoService.findByFilmName("nameRu1");
 
         logger.info("Checking that the method under test does not return null, that it returns the correct value, and that it is called the right number of times");
         assertNotNull(result);
-        assertEquals(Optional.of(film1), result);
+        assertEquals(film1, result);
         verify(repositoryFilms, times(1)).findByFilmName("nameRu1");
         logger.info("the method findAll() works correctly");
     }
@@ -140,12 +140,12 @@ class KinoServiceTest {
     void findByYearGreaterThan() {
         Film film1 = new Film(1L, 1L, "nameRu1", 3000, 1.0, "slogan1\ndescription1\nshortDescription1");
 
-        when(repositoryFilms.findByFilmName("nameRu1")).thenReturn(Optional.of(film1));
-        Optional<Film> result = kinoService.findByFilmName("nameRu1");
+        when(repositoryFilms.findByFilmName("nameRu1")).thenReturn(film1);
+        Film result = kinoService.findByFilmName("nameRu1");
 
         logger.info("Checking that the method under test does not return null, that it returns the correct value, and that it is called the right number of times");
         assertNotNull(result);
-        assertEquals(Optional.of(film1), result);
+        assertEquals(film1, result);
         verify(repositoryFilms, times(1)).findByFilmName("nameRu1");
         logger.info("the method findAll() works correctly");
     }
@@ -155,11 +155,11 @@ class KinoServiceTest {
         Film film1 = new Film(1L, 1L, "nameRu1", 3000, 1.0, "slogan1\ndescription1\nshortDescription1");
         Film film2 = new Film(2L, 2L, "nameRu2", 4000, 2.0, "slogan2\ndescription2\nshortDescription2");
 
-        when(repositoryFilms.findByRatingGreaterThan(1.0)).thenReturn(Optional.of(List.of(film1, film2)));
-        Optional<List<Film>> result = kinoService.findByRatingGreaterThan(1.0);
+        when(repositoryFilms.findByRatingGreaterThan(1.0)).thenReturn(List.of(film1, film2));
+        List<Film> result = kinoService.findByRatingGreaterThan(1.0);
 
-        assertTrue(result.isPresent());
-        assertEquals(2, result.get().size());
+        assertNotNull(result);
+        assertEquals(2, result.size());
         verify(repositoryFilms, times(1)).findByRatingGreaterThan(1.0);
     }
 
@@ -168,11 +168,11 @@ class KinoServiceTest {
         Film film1 = new Film(1L, 1L, "nameRu1", 3000, 1.0, "slogan1\ndescription1\nshortDescription1");
         Film film2 = new Film(2L, 2L, "nameRu2", 4000, 2.0, "slogan2\ndescription2\nshortDescription2");
 
-        when(repositoryFilms.findByRatingLessThanEqual(2.0)).thenReturn(Optional.of(List.of(film1, film2)));
-        Optional<List<Film>> result = kinoService.findByRatingLessThanEqual(2.0);
+        when(repositoryFilms.findByRatingLessThanEqual(2.0)).thenReturn(List.of(film1, film2));
+        List<Film> result = kinoService.findByRatingLessThanEqual(2.0);
 
-        assertTrue(result.isPresent());
-        assertEquals(2, result.get().size());
+        assertNotNull(result);
+        assertEquals(2, result.size());
         verify(repositoryFilms, times(1)).findByRatingLessThanEqual(2.0);
     }
 

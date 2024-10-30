@@ -4,10 +4,14 @@ import com.example.kinopoisk_api_unofficial.client.KinopoiskClient;
 import com.example.kinopoisk_api_unofficial.dto.FilmDto;
 import com.example.kinopoisk_api_unofficial.dto.TypeCollections;
 import com.example.kinopoisk_api_unofficial.model.Film;
+import com.example.kinopoisk_api_unofficial.filters.FilmSpecification;
 import com.example.kinopoisk_api_unofficial.mupstruct.MappingFulms;
 import com.example.kinopoisk_api_unofficial.my_exception.CheckingTheArgumentExceptions;
 import com.example.kinopoisk_api_unofficial.repository.CrudRepositoryFilms;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,20 +19,35 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 public class KinoService {
+    //private final Config config;
     private final CrudRepositoryFilms repositoryFilms;
-    private final MappingFulms mappingFulms;
+    private final MappingFulms mappingFulmsImpl;
     private final KinopoiskClient kinopoiskClient;
 
-    public Optional<List<Film>> saveFilms(Integer id, TypeCollections type){
-        return Optional.of(mappingFulms
+    public Page<Film> pageByRaitingFilms(Double min, Double max, Pageable pageable){
+        Specification<Film> specification = Specification.where(FilmSpecification.ratingBitWin(min, max));
+        return repositoryFilms.findAll(specification, pageable);
+    }
+
+    public Page<Film> pageByYarFilms(Integer min, Integer max, Pageable pageable){
+        Specification<Film> specification = Specification.where(FilmSpecification.yearBitWin(min, max));
+        return repositoryFilms.findAll(specification, pageable);
+    }
+
+    public Page<Film> pageByNameFilms(String name, Pageable pageable){
+        Specification<Film> specification = Specification.where(FilmSpecification.nameBitWin(name));
+        return repositoryFilms.findAll(specification, pageable);
+    }
+
+    public List<Film> saveFilms(Integer id, TypeCollections type){
+        return mappingFulmsImpl
                 .enrichFilms(addListFilmsByType(id, type).get())
                 .stream()
-                .filter(film -> findByFilmName(film.getFilmName()).isEmpty())
-                .map(this::save).collect(Collectors.toList()));
+                .filter(film -> findByFilmName(film.getFilmName()) == null)
+                .map(this::save).collect(Collectors.toList());
     }
 
     //region CR
@@ -41,19 +60,19 @@ public class KinoService {
     public Optional<Film> findById(Long id){
         return repositoryFilms.findById(id);
     }
-    public Optional<Film> findByFilmName(String name){
+    public Film findByFilmName(String name){
         return repositoryFilms.findByFilmName(name);
     }
-    public Optional<Film> findByFilmId(Long id){
+    public Film findByFilmId(Long id){
         return repositoryFilms.findByFilmId(id);
     }
-    public Optional<List<Film>> findByYearGreaterThan(Integer year){
+    public List<Film> findByYearGreaterThan(Integer year){
         return repositoryFilms.findByYearGreaterThan(year);
     }
-    public Optional<List<Film>> findByRatingGreaterThan(Double rating){
+    public List<Film> findByRatingGreaterThan(Double rating){
         return repositoryFilms.findByRatingGreaterThan(rating);
     }
-    public Optional<List<Film>> findByRatingLessThanEqual(Double rating){
+    public List<Film> findByRatingLessThanEqual(Double rating){
         return repositoryFilms.findByRatingLessThanEqual(rating);
     }
     //endregion
@@ -68,7 +87,11 @@ public class KinoService {
         if (id<0 || id> 10){
             throw new  CheckingTheArgumentExceptions().invalidNumber(1, 10);
         }
-        return Optional.ofNullable(kinopoiskClient.addListFilmsByType(id, typeCollections));
+        Optional<List<FilmDto>> result = Optional.ofNullable(kinopoiskClient.addListFilmsByType(id, typeCollections));
+        if (result.isPresent()){
+            return result;
+        }
+        throw new  CheckingTheArgumentExceptions();
     }
     public Optional<FilmDto> findFilmDtoById(Integer id, TypeCollections typeCollections, Long kinoId){
         if (id<0 || id> 10){

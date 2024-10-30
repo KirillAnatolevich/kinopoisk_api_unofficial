@@ -21,8 +21,6 @@ public class Film {
     @Column(length = 30_000)
     private String description;
 
-
-
     public Film(Long filmId, String filmName, Integer year, Double rating, String description) {
         this.filmId = filmId;
         this.filmName = filmName;
