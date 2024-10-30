@@ -86,39 +86,39 @@ public class KinoController {
         return kinoService.addFilmDtoById(id);
     }
     @PostMapping("/filmsByType")
-    public Optional<List<FilmDto>> addListFilmsByType(
+    public List<FilmDto> addListFilmsByType(
             @RequestParam Integer id,
             @RequestParam TypeCollections type){
-        return kinoService.addListFilmsByType(id, type);
+        return kinoService.addListFilmsByType(id, type).get();
     }
 
     @PostMapping("/filmsDtoById")
-    public Optional<FilmDto> findFilmDtoById(
+    public FilmDto findFilmDtoById(
             @RequestParam(required = false) Integer id,
             @RequestParam(required = false) TypeCollections typeCollections,
             @RequestParam(required = false) Long kinoId){
-        return kinoService.findFilmDtoById(id, typeCollections, kinoId);
+        return kinoService.findFilmDtoById(id, typeCollections, kinoId).get();
     }
     @PostMapping("/filmDtoByNameRu")
-    public Optional<FilmDto> findFilmDtoByNameRu(
+    public FilmDto findFilmDtoByNameRu(
             @RequestParam(required = false) Integer id,
             @RequestParam(required = false) TypeCollections typeCollections,
             @RequestParam(required = false) String nameFilm){
-        return kinoService.findFilmDtoByNameRu(id, typeCollections, nameFilm);
+        return kinoService.findFilmDtoByNameRu(id, typeCollections, nameFilm).get();
     }
     @PostMapping("/filmsByRatingFrom")
-    public Optional<List<FilmDto>> findFilmsByRatingFrom(
+    public List<FilmDto> findFilmsByRatingFrom(
             @RequestParam(required = false) Integer id,
             @RequestParam(required = false) TypeCollections typeCollections,
             @RequestParam(required = false) Double ratingFrom){
-        return kinoService.findFilmsByRatingFrom(id, typeCollections, ratingFrom);
+        return kinoService.findFilmsByRatingFrom(id, typeCollections, ratingFrom).get();
     }
     @PostMapping("/findFilmsByRatingToo")
-    public Optional<List<FilmDto>> findFilmsByRatingToo(
+    public List<FilmDto> findFilmsByRatingToo(
             @RequestParam(required = false) Integer id,
             @RequestParam(required = false) TypeCollections typeCollections,
             @RequestParam(required = false) Double ratingTo){
-        return kinoService.findFilmsByRatingToo(id, typeCollections, ratingTo);
+        return kinoService.findFilmsByRatingToo(id, typeCollections, ratingTo).get();
     }
     //endregion
 }
