@@ -8,6 +8,7 @@ import com.example.kinopoisk_api_unofficial.service.KinoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -82,14 +83,14 @@ public class KinoController {
 
     //region POST REST API
     @PostMapping("/filmDtoById")
-    public Optional<FilmDto> addFilmDtoById(@RequestParam Long id){
-        return kinoService.addFilmDtoById(id);
+    public ResponseEntity<FilmDto> addFilmDtoById(@RequestParam Long id){
+        return kinoService.addFilmDtoById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
     @PostMapping("/filmsByType")
-    public List<FilmDto> addListFilmsByType(
+    public ResponseEntity<List<FilmDto>> addListFilmsByType(
             @RequestParam Integer id,
             @RequestParam TypeCollections type){
-        return kinoService.addListFilmsByType(id, type).get();
+        return kinoService.addListFilmsByType(id, type).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/filmsDtoById")
